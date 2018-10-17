@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Config</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="jumbotron" id="header">
+        <h1>Konfiguracja zegarka</h1>
+    </div>
+
+    <div class="container">
+        <h3>Metoda pobierania informacji</h3>
+
+        <div class="checkbox">
+            <input class="radio checkbox-items" type="radio" name="api" />
+            <div class="checkbox-title">
+                API dla lokalizacji i czasu
+            </div>
+            <form class="config-off checkbox-items" method="POST">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="">Treść zapytania serwera API dla lokalizacji</label>
+                        <input type="text" name="full_msc_zap" class="form-control" />
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label for="">Treść zapytania serwera API dla czasu</label>
+                        <input type="text" name="full_czas_zap" class="form-control" />
+                    </div>
+                    <small>$lat, $lon - miejsca na odpowiedzi z serwera lokalizacji</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <label for="smth">Znacznik poprzedzający dane lat</label>
+                        <input class="form-control" type="text" name="full_lat" />
+                    </div>
+
+                    <div class="form-group col-md-3">
+                        <label for="">Znacznik poprzedzający dane lon</label>
+                        <input class="form-control" type="text" name="full_lon" />
+                    </div>
+
+                    <div class="form-group col-md-3">
+                        <label for="">Znacznik poprzedzający dane czasu</label>
+                        <input class="form-control" type="text" name="full_czas" />
+                    </div>
+
+                    <div class="form-group col-md-3">
+                        <label for="">Znacznik poprzedzający kod kraju</label>
+                        <input class="form-control" type="text" name="full_kraj" />
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+        </div>
+
+        <div class="checkbox">
+            <input class="radio checkbox-items" type="radio" name="api" />
+            <div class="checkbox-title">
+                API tylko dla czasu
+            </div>
+            <form class="config-off checkbox-items" method="POST">
+                <div class="form-row">
+                    <div class="form-group col-md-5">
+                        <label for="">Treść zapytania serwera API dla czasu</label>
+                        <input class="form-control" type="text" name="czas_czas_zap" />
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label for="">Znacznik poprzedzający dane czasu</label>
+                        <input class="form-control" type="text" name="czas_czas" />
+                    </div>
+
+                    <div class="form-group col-md-3">
+                        <label for="">Różnica czasu względem południka 0:</label>
+                        <input class="form-control" type="number" name="czas_gmtoffset" pattern="\d+" value="0" />
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+        </div>
+
+        <div class="checkbox">
+            <input class="radio checkbox-items" type="radio" name="api" />
+            <div class="checkbox-title">
+                Serwer NTF
+            </div>
+
+            <form class="config-off checkbox-items" method="POST">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="">Adres serwera NTP</label>
+                        <input class="form-control"type="url" name="ntp_adres" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="">Różnica czasu względem południka 0</label>
+                        <input class="form-control" type="number" name="ntp_gmtoffset" pattern="\d+" value="0" />
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+        </div>
+
+        <div class="checkbox">
+            <input class="radio checkbox-items" type="radio" name="api" />
+            <div class="checkbox-title">
+                Konfiguracja ręczna
+            </div>
+            <form class="config-off checkbox-items" method="POST">
+                <div class="form-row">
+                    <div class="form-group col-md-5">
+                        <label for="">Dane przesłane bezpośrednio do zegarka</label>
+                        <input class="form-control" type="datetime-local" name="dataczas" />
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+        </div>
+
+        <form method="post" name="wifi">
+            <h3>Konfiguracja WiFi</h3>
+            <h4>SSID(nazwa)</h4>
+            Wykryte sieci:
+            <select class="form-control" name="ssid">
+                <option value="">Choose..</option>
+            </select>
+            <label for="">Inna</label>
+            <input class="form-control" type="text" name="_ssid" />
+            <label>Hasło</label>
+            <input type="text" name="haslo" />
+
+            <center>
+                <input type="submit" value="Zapisz" />
+            </center>
+        </form>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
