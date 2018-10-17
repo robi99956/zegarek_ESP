@@ -7,7 +7,7 @@ char status_str[] = "STATUS";
 char scan_str[] = "SCAN";
 char ip_str[] = "GETIP";
 char reset_str[] = "RESET";
-char get_requests_str[] = "GET";
+char file_str[] = "FILE";
 char get_post_requests_str[] = "POST";
 
 void uart_parse( String &dane, bool is_main_loop )
@@ -17,7 +17,6 @@ void uart_parse( String &dane, bool is_main_loop )
 
 	if( strncmp(c_dane, connect_str, sizeof(connect_str)-1) == 0 )
 		connect_to_wifi( c_dane+sizeof(connect_str), is_main_loop );
-//		uart_send_std("dupa");
 	else
 		if( strncmp(c_dane, time_str, sizeof(time_str)-1) == 0 )
 		get_time(is_main_loop);
@@ -37,8 +36,8 @@ void uart_parse( String &dane, bool is_main_loop )
 		if( strncmp(c_dane, reset_str, sizeof(reset_str)-1) == 0 )
 		{ if( is_main_loop ) ESP.restart(); }
 	else
-		if( strncmp(c_dane, get_requests_str, sizeof(get_requests_str)-1) == 0 )
-		send_get_request();
+		if( strncmp(c_dane, file_str, sizeof(file_str)-1) == 0 )
+		read_file_from_uart( c_dane + sizeof(file_str) );
 	else
 		if( strncmp(c_dane, get_post_requests_str, sizeof(get_post_requests_str)-1) == 0 )
 		send_post_request();

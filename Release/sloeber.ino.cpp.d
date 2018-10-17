@@ -110,8 +110,9 @@ sloeber.ino.cpp.o: ..\sloeber.ino.cpp \
  C:\eclipse\eclipse_ESP8266\/arduinoPlugin/packages/esp8266/hardware/esp8266/2.4.0/tools/sdk/include/queue.h \
  C:\eclipse\eclipse_ESP8266\/arduinoPlugin/packages/esp8266/hardware/esp8266/2.4.0/tools/sdk/include/spi_flash.h \
  C:\eclipse\eclipse_ESP8266\/arduinoPlugin/packages/esp8266/hardware/esp8266/2.4.0/tools/sdk/include/gpio.h \
- ..\zegar.ino ..\jquery.tab ..\bootstrap_js.tab ..\bootstrap_css.tab \
- ..\client.ino ..\parsers.ino ..\uart_parse.ino ..\wifi_setup.ino
+ ..\main.h ..\zegar.ino ..\jquery.tab ..\bootstrap_js.tab \
+ ..\bootstrap_css.tab ..\client.ino ..\parsers.ino ..\uart_parse.ino \
+ ..\wifi_setup.ino
 
 C:\eclipse\eclipse_ESP8266\arduinoPlugin\packages\esp8266\hardware\esp8266\2.4.0\cores\esp8266/Arduino.h:
 
@@ -336,6 +337,8 @@ C:\eclipse\eclipse_ESP8266\/arduinoPlugin/packages/esp8266/hardware/esp8266/2.4.
 C:\eclipse\eclipse_ESP8266\/arduinoPlugin/packages/esp8266/hardware/esp8266/2.4.0/tools/sdk/include/spi_flash.h:
 
 C:\eclipse\eclipse_ESP8266\/arduinoPlugin/packages/esp8266/hardware/esp8266/2.4.0/tools/sdk/include/gpio.h:
+
+..\main.h:
 
 ..\zegar.ino:
 

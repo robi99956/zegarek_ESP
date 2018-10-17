@@ -4,20 +4,22 @@
 #include <ESP8266WebServer.h>
 #include <pgmspace.h>
 #include <queue>
+#include <vector>
+
+#include "main.h"
 
 void serialEvent( bool );
 void uart_send_std( const char * dane );
 uint32_t flash_read( const void *src, void *dst, uint32_t len );
+http_file_t * get_file_by_path( String path );
 
 //CONNECT TP-LINK_E6001A 995760ROBERT
 //CONNECT Fiszera 00000111111
 
 ESP8266WebServer server(80);
 
-char strona_buf[15000];
-String get_request;
-size_t read_data_len;
 std::queue<String> post_requests;
+std::vector<http_file_t> http_files;
 
 #define ALIGN     __attribute__ (( aligned ( 4 ) ))
 #define INFLASH   PROGMEM ALIGN
@@ -68,22 +70,6 @@ class handler : public RequestHandler
 		return 0;
 	}
 
-	size_t wait_for_pool( String requestUri )
-	{
-		get_request = requestUri;
-
-		uint32_t start_tick = millis();
-
-		while( millis() - start_tick < 5000 && read_data_len == 0 )
-		{
-			serialEvent(0);
-		}
-
-		size_t retval = read_data_len;
-		read_data_len=0;
-
-		return retval;
-	}
 
 	bool handle (ESP8266WebServer &server, HTTPMethod requestMethod, String requestUri)
 	{
@@ -91,11 +77,8 @@ class handler : public RequestHandler
 		{
 			if( process_LIB(requestUri) ) return 0;
 
-			size_t len = wait_for_pool(requestUri);
-
-			if( len == 0 ) return 0;
-
-			strona_buf[len] = 0;
+			http_file_t * file = get_file_by_path(requestUri);
+			if( file == NULL ) return 0;
 
 			String dataType = "text/plain";
 			if(requestUri.endsWith(".htm") || requestUri.endsWith(".html") || requestUri.endsWith("/") ) dataType = "text/html";
@@ -103,7 +86,7 @@ class handler : public RequestHandler
 			else if(requestUri.endsWith(".js")) dataType = "application/javascript";
 			else if(requestUri.endsWith(".png")) dataType="image/png";
 
-			server.send(200, dataType, strona_buf);
+			server.send(200, dataType, String(file->data));
 
 			return 1;
 		}
@@ -132,21 +115,21 @@ handler zapytania;
 
 void setup(void)
 {
-  WiFi.mode(WIFI_STA);
+	WiFi.mode(WIFI_STA);
 
-  Serial.begin(115200);
-  Serial.setTimeout(10000);
+	Serial.begin(115200);
+	Serial.setTimeout(10000);
 
-  server.addHandler( &zapytania );
+	server.addHandler( &zapytania );
 
-  server.begin();
+	server.begin();
 
-  WiFi.disconnect();
+	WiFi.disconnect();
 }
 
 void loop(void)
 {
-	reconnect_event(); // @suppress("Invalid arguments")
+//	reconnect_event(); // @suppress("Invalid arguments")
 	server.handleClient();
 	serialEvent(1);
 }
@@ -180,21 +163,6 @@ uint32_t flash_read( const void *src, void *dst, uint32_t len )
 	return len;
 }
 
-void send_get_request( void )
-{
-	if( get_request.length() > 0 )
-	{
-		uart_send_std( ("GET " + get_request).c_str() );
-		get_request = "";
-
-		read_data_len = Serial.readBytesUntil('\r', strona_buf, sizeof(strona_buf)-1);
-	}
-	else
-	{
-		uart_send_std( "GET NONE" );
-	}
-}
-
 void send_post_request( void )
 {
 	if( post_requests.empty() )
@@ -218,5 +186,46 @@ void send_post_request( void )
 	}
 }
 
+void read_file_from_uart( char * cmd )
+{
+	char * path = strtok(cmd, " ");
+	WSK_CHECK(path);
+	char * _len = strtok(NULL, " ");
+	WSK_CHECK(_len);
 
+	http_file_t new_file;
 
+	uint16_t len = atoi(_len);
+	new_file.data = (char*)malloc(len+1);
+	
+	if( new_file.data == NULL )
+	{
+		uart_send_std("FILE ERROR");
+		return;
+	}
+
+	new_file.data[ len ] = 0;
+
+	new_file.path = String(path);
+
+	uart_send_std("FILE READY");
+
+	Serial.readBytes(new_file.data, len);
+
+	http_files.push_back(new_file);
+}
+
+http_file_t * get_file_by_path( String path )
+{
+	size_t len = http_files.size();
+
+	while(len--)
+	{
+		if( http_files[len].path == path )
+		{
+			return &(http_files.data()[len]);
+		}
+	}
+
+	return NULL;
+}

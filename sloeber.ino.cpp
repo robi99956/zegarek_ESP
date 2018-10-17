@@ -2,7 +2,7 @@
 //This is a automatic generated file
 //Please do not modify this file
 //If you touch this file your change will be overwritten during the next build
-//This file has been generated on 2018-10-17 21:01:55
+//This file has been generated on 2018-10-18 01:45:14
 
 #include "Arduino.h"
 #include <ESP8266HTTPClient.h>
@@ -15,17 +15,18 @@
 #include <ESP8266WiFiAP.h>
 #include <ESP8266WebServer.h>
 #include <user_interface.h>
+#include "main.h"
 #include "Arduino.h"
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <pgmspace.h>
 #include <queue>
+#include <vector>
+#include "main.h"
 extern ESP8266WebServer server;
-extern char strona_buf[];
-extern String get_request;
-extern size_t read_data_len;
 extern std::queue<String> post_requests;
+extern std::vector<http_file_t> http_files;
 #define ALIGN     __attribute__ (( aligned ( 4 ) ))
 #define INFLASH   PROGMEM ALIGN
 extern const int8_t jquery_min[];
@@ -65,8 +66,9 @@ void setup(void) ;
 void loop(void) ;
 void serialEvent( bool is_main_loop ) ;
 uint32_t flash_read( const void *src, void *dst, uint32_t len ) ;
-void send_get_request( void ) ;
 void send_post_request( void ) ;
+void read_file_from_uart( char * cmd ) ;
+http_file_t * get_file_by_path( String path ) ;
 
 #include "zegar.ino"
 

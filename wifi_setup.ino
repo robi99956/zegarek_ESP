@@ -5,12 +5,12 @@
 #include <ESP8266WebServer.h>
 #include <user_interface.h>
 
+#include "main.h"
+
 //CONNECT TP-LINK_E6001A 995760ROBERT
 //CONFIG NTP 150.254.183.15 RRRR-MM-DD_gg:mm:ss 1 1
 //CONFIG TIME http://api.geonames.org/timezone?lat=54&lng=0&username=robi99956&style=full <time> RRRR-MM-DD_gg:mm:ss 1 1
 //CONFIG LOCTIME http://ip-api.com/xml http://api.geonames.org/timezone?lat=$lat&lng=$lon&username=robi99956&style=full <lon> <lat> <time> RRRR-MM-DD_gg:mm:ss
-
-#define WSK_CHECK(wsk) if(wsk==NULL){uart_send_std((const char*)"ERROR");return;}
 
 String loc_url;
 String time_url;
@@ -43,7 +43,7 @@ void connect_to_wifi( char * ssid_pass, bool legal_call )
 
 	strcpy(ssid, _ssid);
 	strcpy(pass, _pass);
-#if 0
+#if 1
 	static ap_state state=OFF;
 
 	WiFi.disconnect(1);
@@ -138,7 +138,7 @@ void set_config( char * conf, bool legal_call )
 {
 	if( legal_call == 0 )
 	{
-		uart_send_std("CONFIG");
+		uart_send_std("CONFIG"); // @suppress("Invalid arguments")
 		return;
 	}
 
@@ -193,7 +193,7 @@ void set_config( char * conf, bool legal_call )
 		gmt_offset = atoi(offset);
 
 		char * latozima = strtok(NULL, " ");
-		WSK_CHECK(latozima);
+		WSK_CHECK(latozima); // @suppress("Invalid arguments")
 		uzyj_latozima = atoi(latozima);
 	  }
 	  else
