@@ -17,6 +17,7 @@ RM := del
 -include core\core\spiffs\subdir.mk
 -include core\core\libb64\subdir.mk
 -include core\core\subdir.mk
+-include Scheduler\subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)

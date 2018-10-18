@@ -30,20 +30,8 @@ ESP8266WiFiAPClass AP;
 
 char ssid[40], pass[40];
 
-void connect_to_wifi( char * ssid_pass, bool legal_call )
+void wifi_connect( void )
 {
-	if( legal_call == 0 )
-	{
-		uart_send_std("CONNECT"); // @suppress("Invalid arguments")
-		return;
-	}
-
-	char * _ssid = strtok(ssid_pass, " ");
-	char * _pass = strtok(NULL, " ");
-
-	strcpy(ssid, _ssid);
-	strcpy(pass, _pass);
-#if 1
 	static ap_state state=OFF;
 
 	WiFi.disconnect(1);
@@ -83,43 +71,17 @@ void connect_to_wifi( char * ssid_pass, bool legal_call )
 	}
 
 	uart_send_std("CONNECT OK"); // @suppress("Invalid arguments")
-#else
-	WiFi.disconnect(1);
-	WiFi.begin(ssid, pass);
-
-	uart_send_std("CONNECT OK"); // @suppress("Invalid arguments")
-#endif
 }
 
-void reconnect_event( void )
+void connect_to_wifi( char * ssid_pass )
 {
-	station_status_t status = wifi_station_get_connect_status();
-	static bool ap_on=0;
+	char * _ssid = strtok(ssid_pass, " ");
+	char * _pass = strtok(NULL, " ");
 
-	if( status != STATION_CONNECTING && status != STATION_GOT_IP )
-	{
-		WiFi.disconnect(1);
-		WiFi.begin(ssid, pass);
+	strcpy(ssid, _ssid);
+	strcpy(pass, _pass);
 
-		if( ap_on == 0 )
-		{
-			WiFi.mode(WIFI_AP_STA);
-			AP.softAPConfig(IPAddress(192, 168, 1, 1), IPAddress(192, 168, 1, 1), IPAddress(255, 255, 255, 0));
-			AP.softAP("zegarek");
-			ap_on = 1;
-		}
-	}
-	else
-		if( status == STATION_GOT_IP )
-		{
-			if( AP.softAPgetStationNum() == 0 )
-			{
-				AP.softAPdisconnect(1);
-				WiFi.mode(WIFI_STA);
-				ap_on = 0;
-			}
-		}
-
+	wifi_connect();
 }
 
 IPAddress get_ip( char * ip )
@@ -134,14 +96,8 @@ IPAddress get_ip( char * ip )
    return IPAddress(a, b, c, d);
 }
 
-void set_config( char * conf, bool legal_call )
+void set_config( char * conf  )
 {
-	if( legal_call == 0 )
-	{
-		uart_send_std("CONFIG"); // @suppress("Invalid arguments")
-		return;
-	}
-
 	char * mode = strtok(conf, " ");
 
 	WSK_CHECK(mode); // @suppress("Invalid arguments")
@@ -166,7 +122,7 @@ void set_config( char * conf, bool legal_call )
 		gmt_offset = atoi(offset);
 
 		char * latozima = strtok(NULL, " ");
-		WSK_CHECK(latozima);
+		WSK_CHECK(latozima); // @suppress("Invalid arguments")
 		uzyj_latozima = atoi(latozima);
 
 		ntp_ip = get_ip(ip);
@@ -231,28 +187,20 @@ void set_config( char * conf, bool legal_call )
 		uart_send_std("OK"); // @suppress("Invalid arguments")
 }
 
-void get_status( bool legal_call )
+void get_status( void )
 {
 	String stat = "STATUS ";
 
-	if( legal_call )
-	{
-		if( WiFi.status() != WL_CONNECTED ) stat += "DISCONNECTED";
-		else stat += "CONNECTED";
-	}
+	if( WiFi.status() != WL_CONNECTED ) stat += "DISCONNECTED";
+	else stat += "CONNECTED";
 
 	uart_send_std( stat.c_str() ); // @suppress("Invalid arguments")
 }
 
-void get_ip( bool legal_call )
+void get_ip( void )
 {
-	if( legal_call )
-	{
 		if( WiFi.status() == WL_CONNECTED ) uart_send_std( ("IP " + WiFi.localIP().toString()).c_str() ); // @suppress("Invalid arguments")
 		else uart_send_std( "IP DISCONNECTED" ); // @suppress("Invalid arguments")
-	}
-	else
-		uart_send_std("IP");
 }
 
 void scan_callback( int ile )
@@ -269,9 +217,9 @@ void scan_callback( int ile )
 	uart_send_std("WIFI LIST END"); // @suppress("Invalid arguments")
 }
 
-void wifi_scan( bool legal_call )
+void wifi_scan( void )
 {
-	if( legal_call ) WiFi.scanNetworksAsync(scan_callback, 0);
+	WiFi.scanNetworksAsync(scan_callback, 0);
 }
 
 

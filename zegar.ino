@@ -6,9 +6,10 @@
 #include <queue>
 #include <vector>
 
+#include "Scheduler/scheduler.h"
 #include "main.h"
 
-void serialEvent( bool );
+void serialEvent( void );
 void uart_send_std( const char * dane );
 uint32_t flash_read( const void *src, void *dst, uint32_t len );
 http_file_t * get_file_by_path( String path );
@@ -75,7 +76,9 @@ class handler : public RequestHandler
 	{
 		if( requestMethod == HTTP_GET )
 		{
-			if( process_LIB(requestUri) ) return 0;
+			if( process_LIB(requestUri) ) return 1;
+
+			uart_send_std(requestUri.c_str());
 
 			http_file_t * file = get_file_by_path(requestUri);
 			if( file == NULL ) return 0;
@@ -129,12 +132,12 @@ void setup(void)
 
 void loop(void)
 {
-//	reconnect_event(); // @suppress("Invalid arguments")
+	scheduler_pool();
 	server.handleClient();
-	serialEvent(1);
+	serialEvent();
 }
 
-void serialEvent( bool is_main_loop )
+void serialEvent( void )
 {
   static String wejscie_str;
 
@@ -144,7 +147,7 @@ void serialEvent( bool is_main_loop )
 
     if( inChar == '\r' )
     {
-      uart_parse(wejscie_str, is_main_loop); // @suppress("Invalid arguments")
+      uart_parse(wejscie_str); // @suppress("Invalid arguments")
 
       wejscie_str = "";
       return;
@@ -190,13 +193,16 @@ void read_file_from_uart( char * cmd )
 {
 	char * path = strtok(cmd, " ");
 	WSK_CHECK(path);
+
+	if( get_file_by_path(path) ) return;
+
 	char * _len = strtok(NULL, " ");
 	WSK_CHECK(_len);
 
 	http_file_t new_file;
 
 	uint16_t len = atoi(_len);
-	new_file.data = (char*)malloc(len+1);
+	new_file.data = (char*)calloc(len+1, 1);
 	
 	if( new_file.data == NULL )
 	{
@@ -210,9 +216,12 @@ void read_file_from_uart( char * cmd )
 
 	uart_send_std("FILE READY");
 
-	Serial.readBytes(new_file.data, len);
+	size_t read_len = Serial.readBytesUntil('\r', new_file.data, len);
 
 	http_files.push_back(new_file);
+
+	if( read_len == len ) uart_send_std("FILE OK");
+	else uart_send_std("FILE ERROR");
 }
 
 http_file_t * get_file_by_path( String path )

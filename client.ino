@@ -28,30 +28,27 @@ bool client_GET( const char * url, String &dane )
 	return retval;
 }
 
-void get_time( bool legal_call )
+void get_time( void )
 {
 	String czas = "TIME ";
 
-	if( legal_call )
+	switch( time_mode )
 	{
-		switch( time_mode )
-		{
-		case MANUAL:
-			czas += "MANUAL";
-			break;
+	case MANUAL:
+		czas += "MANUAL";
+		break;
 
-		case NTP:
-			czas += get_time_NTP();
-			break;
+	case NTP:
+		czas += get_time_NTP();
+		break;
 
-		case API_TIME:
-			czas += get_time_TIMEAPI();
-			break;
+	case API_TIME:
+		czas += get_time_TIMEAPI();
+		break;
 
-		case API_LOCTIME:
-			czas += get_time_LOCTIMEAPI();
-			break;
-		}
+	case API_LOCTIME:
+		czas += get_time_LOCTIMEAPI();
+		break;
 	}
 
 	uart_send_std( czas.c_str() );

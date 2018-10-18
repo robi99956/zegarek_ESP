@@ -10,31 +10,31 @@ char reset_str[] = "RESET";
 char file_str[] = "FILE";
 char get_post_requests_str[] = "POST";
 
-void uart_parse( String &dane, bool is_main_loop )
+void uart_parse( String &dane )
 {
 	char * c_dane = (char*)calloc(dane.length()+1, 1);
 	strcpy(c_dane, dane.c_str());
 
 	if( strncmp(c_dane, connect_str, sizeof(connect_str)-1) == 0 )
-		connect_to_wifi( c_dane+sizeof(connect_str), is_main_loop );
+		connect_to_wifi( c_dane+sizeof(connect_str) );
 	else
 		if( strncmp(c_dane, time_str, sizeof(time_str)-1) == 0 )
-		get_time(is_main_loop);
+		get_time();
 	else
 		if( strncmp(c_dane, config_str, sizeof(config_str)-1) == 0 )
-		set_config(c_dane + sizeof(config_str), is_main_loop );
+		set_config(c_dane + sizeof(config_str) );
 	else
 		if( strncmp(c_dane, status_str, sizeof(status_str)-1) == 0 )
-		get_status(is_main_loop);
+		get_status();
 	else
 		if( strncmp(c_dane, scan_str, sizeof(scan_str)-1) == 0 )
-		wifi_scan(is_main_loop);
+		wifi_scan();
 	else
 		if( strncmp(c_dane, ip_str, sizeof(ip_str)-1) == 0 )
-		get_ip(is_main_loop);
+		get_ip();
 	else
 		if( strncmp(c_dane, reset_str, sizeof(reset_str)-1) == 0 )
-		{ if( is_main_loop ) ESP.restart(); }
+		ESP.restart();
 	else
 		if( strncmp(c_dane, file_str, sizeof(file_str)-1) == 0 )
 		read_file_from_uart( c_dane + sizeof(file_str) );
